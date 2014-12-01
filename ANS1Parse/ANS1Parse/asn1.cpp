@@ -70,32 +70,33 @@ int asn1parse( const unsigned char *buffer,
     }
   
     // TODO deal with "high tag numbers"
-    token->constructed = tag & 0x20;
-    token->tag_class = ( tag & 0xC0 ) >> 6;
-    token->tag = tag & 0x1F;
+    token->constructed = tag & 0x20;   //结构类型，是简单还是复合类型(bit6)
+	token->tag_class = ( tag & 0xC0 ) >> 6;  //(用来表示Tag类型，共有四种，分别是universal(00)、application(01)、context-specific(10)和private(11)。
+                                           //这两位为universal（00）时，bit5-bit1的值表示不同的universal的值：)
+    token->tag = tag & 0x1F;              //当Tag值为00时，类型的Tag值(bit5 - bit1)
     token->length = tag_length;
-    token->data = ptr;
+    token->data = ptr;        // TlV的数据
     token->children = NULL;
     token->next = NULL;
 
-    if ( tag & 0x20 )
+    if ( tag & 0x20 )  //如果是复合类型的
     {
-      token->length = tag_length + ( ptr - ptr_begin );
+      token->length = tag_length + ( ptr - ptr_begin );  //整个大TLV标签的长度
 
-      token->data = ptr_begin;
+      token->data = ptr_begin;  //整个数据的长度
 
       // Append a child to this tag and recurse into it
       token->children = ( struct asn1struct * ) 
         malloc( sizeof( struct asn1struct ) );
 
-      asn1parse( ptr, tag_length, token->children );
+      asn1parse( ptr, tag_length, token->children ); //解析一下个TLV标签
     }
 
     ptr += tag_length;
     length -= tag_length;
 
     // At this point, we're pointed at the tag for the next token in the buffer.
-    if ( length )
+    if ( length )   // 如果是简单类型的
     {
       token->next = ( struct asn1struct * ) malloc( sizeof( struct asn1struct ) ); 
       token = token->next;

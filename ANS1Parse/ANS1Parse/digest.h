@@ -4,7 +4,7 @@
 int digest_hash( unsigned char *input,
          int len, 
          unsigned int *hash,
-         void (*block_operate)(const unsigned char *input, unsigned int hash[] ),
+         void (*block_operate)(const unsigned char *input, unsigned int hash[] ), //函数参数里的函数指针
          void (*block_finalize)(unsigned char *block, int length ) );
 
 #define DIGEST_BLOCK_SIZE 64
@@ -16,7 +16,7 @@ typedef struct
   int hash_len;
   unsigned int input_len;
 
-  void (*block_operate)(const unsigned char *input, unsigned int hash[] );
+  void (*block_operate)(const unsigned char *input, unsigned int hash[] );       //结构体里的函数指针
   void (*block_finalize)(unsigned char *block, int length );
 
   // Temporary storage

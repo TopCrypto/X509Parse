@@ -58,8 +58,8 @@ int rsa_encrypt( unsigned char *input,
   while ( len )
   {
     encrypted_size += modulus_length;
-    block_size = ( len < modulus_length - 11 ) ? 
-      len : ( modulus_length - 11 );
+    block_size = ( (int)len < modulus_length - 11 ) ? 
+      (int)len : ( modulus_length - 11 );
     memset( padded_block, 0, modulus_length );
     memcpy( padded_block + ( modulus_length - block_size ), 
       input, block_size );
@@ -113,7 +113,7 @@ int rsa_decrypt( unsigned char *input,
   
   while ( len )
   {
-    if ( len < modulus_length )
+    if ( (int)len < modulus_length )
     {
       fprintf( stderr, "Error - input must be an even multiple \
         of key modulus %d (got %d)\n",

@@ -217,11 +217,11 @@ void new_md5_digest( digest_ctx *context )
   context->input_len = 0;
   context->block_len = 0;
   context->hash = ( unsigned int * ) 
-   malloc( context->hash_len * sizeof( unsigned int ) );
+   malloc( context->hash_len * sizeof( unsigned int ) ); //为指针分配空间大小为16字节
   memcpy( context->hash, md5_initial_hash, 
    context->hash_len * sizeof( unsigned int ) );
   memset( context->block, '\0', DIGEST_BLOCK_SIZE );
-  context->block_operate = md5_block_operate;
+  context->block_operate = md5_block_operate; // 函数名就是指针
   context->block_finalize = md5_finalize;
 } 
 

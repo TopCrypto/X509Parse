@@ -100,7 +100,7 @@
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="2"
-			CharacterSet="1"
+			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -202,10 +202,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\DataCode.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\digest.cpp"
 				>
 			</File>
@@ -257,6 +253,24 @@
 				RelativePath=".\x509.cpp"
 				>
 			</File>
+			<Filter
+				Name="Resource Files"
+				Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+				UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+				>
+				<File
+					RelativePath=".\res\ANS1Parse.ico"
+					>
+				</File>
+				<File
+					RelativePath=".\ANS1Parse.rc"
+					>
+				</File>
+				<File
+					RelativePath=".\res\ANS1Parse.rc2"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -277,10 +291,6 @@
 			</File>
 			<File
 				RelativePath=".\base64.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DataCode.h"
 				>
 			</File>
 			<File
@@ -325,24 +335,6 @@
 			</File>
 			<File
 				RelativePath=".\x509.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-			<File
-				RelativePath=".\res\ANS1Parse.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\ANS1Parse.rc"
-				>
-			</File>
-			<File
-				RelativePath=".\res\ANS1Parse.rc2"
 				>
 			</File>
 		</Filter>

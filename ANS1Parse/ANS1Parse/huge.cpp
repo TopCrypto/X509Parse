@@ -99,9 +99,9 @@ void contract( huge *h )
 {
   int i = 0;
 
-  while ( !( h->rep[ i ] ) && ( i < h->size ) ) { i++; }
+  while ( !( h->rep[ i ] ) && ( i < (int)h->size ) ) { i++; }
 
-  if ( i && i < h->size )
+  if ( i && i < (int)h->size )
   {
     unsigned char *tmp = &h->rep[ i ];
     h->rep = ( unsigned char * ) calloc( h->size - i, 
@@ -272,12 +272,14 @@ void set_huge( huge *h, unsigned int val )
 
   // Figure out the minimum amount of space this "val" will take
   // up in chars (leave at least one byte, though, if ìval?is 0).
+  int j = 0;
   for ( mask = 0xFF000000; mask > 0x000000FF; mask >>=8 )
   {
     if ( val & mask )
     {
       break;
     }
+	j++;
     h->size--;
   }
 
@@ -290,7 +292,7 @@ void set_huge( huge *h, unsigned int val )
   shift = 0;
   for ( i = h->size; i; i-- )
   {
-    h->rep[ i - 1 ] = ( val & mask ) >> shift;
+    h->rep[ i - 1 ] = ( val & mask ) >> shift; //∆‰ÃÓ≥‰≥ı º÷µ
     mask <<= 8;
     shift += 8;
   }
@@ -383,7 +385,7 @@ int compare( huge *h1, huge *h2 )
   // until one is bigger than another - once we've found one, it's 
   // safe to stop, since the "lower order bytes" can't affect the
   // comparison
-  while ( i < h1->size && j < h2->size )
+  while ( i <(int) h1->size && j <(int) h2->size )
   {
     if ( h1->rep[ i ] < h2->rep[ j ] )
     {
@@ -414,7 +416,7 @@ static void right_shift( huge *h1 )
     carry = ( h1->rep[ i ] & 0x01 ) << 7;
     h1->rep[ i ] = ( h1->rep[ i ] >> 1 ) | old_carry;
   }
-  while ( ++i < h1->size );
+  while ( ++i < (int) h1->size );
 
   contract( h1 );
 }

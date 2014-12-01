@@ -123,7 +123,7 @@ BOOL CANS1ParseDlg::OnInitDialog()
     m_listCtrl.SetExtendedStyle(LVS_EX_FLATSB|LVS_EX_FULLROWSELECT|LVS_EX_HEADERDRAGDROP|
 		LVS_EX_ONECLICKACTIVATE|LVS_EX_GRIDLINES);
     m_listCtrl.InsertColumn(0, "字段", LVCFMT_LEFT, 150);
-	m_listCtrl.InsertColumn(1, "成绩", LVCFMT_LEFT, 150);
+	m_listCtrl.InsertColumn(1, "值", LVCFMT_LEFT, 150);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -239,6 +239,7 @@ void CANS1ParseDlg::GetCertInfo()
 	//CString csMsg;
 	signed_x509_certificate certificate;
 	SetDlgItemText(IDC_EDIT1, "");
+    m_listCtrl.DeleteAllItems(); 
 	x509Info x509_msg;
 
 	// now parse it
@@ -289,7 +290,6 @@ void CANS1ParseDlg::GetCertInfo()
 void CANS1ParseDlg::OnBnClickedButton2()
 {
 	// TODO: Add your control notification handler code here
-
 	CString lpstrName;
 	CString	strFilePath;
 	char cLocalDir[1000];

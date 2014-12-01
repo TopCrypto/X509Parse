@@ -59,7 +59,7 @@ typedef struct
   // DSA parameters, only if algorithm == dsa
   huge dsa_public_key;
 } 
-public_key_info;
+public_key_info;   //不一定要用联合体，用了联合体反而复杂化了。
 
 typedef huge objectIdentifier;
 
@@ -93,7 +93,6 @@ signed_x509_certificate;
 
 typedef struct 
 { 
-
   char *modulus;
   char *exponent;
   char *signValue;

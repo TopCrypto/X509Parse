@@ -23,7 +23,7 @@
  * otherwise.
  * This isn't shown in the book.
  */
-int validate_node( struct asn1struct *source, 
+int validate_node( struct asn1struct *source,   //检查节点信息
                    int expected_tag, 
                    int expected_children,
                    const char *desc )
@@ -64,14 +64,17 @@ int validate_node( struct asn1struct *source,
 void init_x509_certificate( signed_x509_certificate *certificate )
 {
   set_huge( &certificate->tbsCertificate.serialNumber, 1 );
-  memset( &certificate->tbsCertificate.issuer, 0, sizeof( name ) );
+  memset( &certificate->tbsCertificate.issuer, 0, sizeof( name ) ); //虽未分配空间，但此时将其指针赋值为NULL = 0
   memset( &certificate->tbsCertificate.subject, 0, sizeof( name ) );
-  certificate->tbsCertificate.subjectPublicKeyInfo.rsa_public_key.modulus =(huge *)
+
+  certificate->tbsCertificate.subjectPublicKeyInfo.rsa_public_key.modulus =(huge *)  //为第一个指针*huge modulus赋值
     malloc( sizeof( huge ) );
+
   certificate->tbsCertificate.subjectPublicKeyInfo.rsa_public_key.exponent =(huge *)
     malloc( sizeof( huge ) );
+
   set_huge( 
-    certificate->tbsCertificate.subjectPublicKeyInfo.rsa_public_key.modulus,
+    certificate->tbsCertificate.subjectPublicKeyInfo.rsa_public_key.modulus,   //为huge里面的指针rep赋值
     0 );
   set_huge( 
     certificate->tbsCertificate.subjectPublicKeyInfo.rsa_public_key.exponent,
@@ -85,50 +88,27 @@ void init_x509_certificate( signed_x509_certificate *certificate )
 
 void init_x509_msg(x509Info * x509_msg)
 {
-
-	//memset( &certificate->tbsCertificate.issuer, 0, sizeof( name ) );
-	////memset( &certificate->tbsCertificate.subject, 0, sizeof( name ) );
-
-
-  x509_msg->version = (char*) malloc(200);
-  x509_msg->serialnumber = (char*)malloc(200);
-  x509_msg->issuer = (char *)malloc(200);
-  x509_msg->subject = (char*)malloc(200);
-  x509_msg->notbefore = (char*)malloc(200);
-  x509_msg->notafter = (char*)malloc(200);
-  x509_msg->algFlag = (char*)malloc(200);
-  
-  memset(&x509_msg->ds, 0, sizeof(dsa_info));
-  
-  x509_msg->ds.y = (char*)malloc(200);
-  x509_msg->ds.p = (char*)malloc(200);
-  x509_msg->ds.q = (char*)malloc(200);
-  x509_msg->ds.g = (char*)malloc(200);
-  x509_msg->ds.r = (char*)malloc(200);
-  x509_msg->ds.s = (char*)malloc(200);
-  
-  memset(&x509_msg->rs, 0, sizeof(ras_info));
-  x509_msg->rs.exponent = (char *)malloc(200);
-  x509_msg->rs.modulus = (char *)malloc(600);
-  x509_msg->rs.signValue = (char *)malloc(600);
-
-  x509_msg->signAlgorithm = (char *)malloc(200);
-  x509_msg->caflag = (char *)malloc(200);
+   memset(x509_msg, 0, sizeof(x509Info));
+   memset(&(x509_msg->ds), 0, sizeof( dsa_info ) ); //虽未分配空间，但此时将其指针赋值为NULL = 0
+   memset(&(x509_msg->rs), 0, sizeof( ras_info));
 }
 
 
 void free_x509_msg(x509Info * x509_msg)
 {
-	if(x509_msg->version)
-	{ 
-		free(x509_msg->version); 
-	}
+	if(x509_msg->version){ free(x509_msg->version); }
+	int t = strlen(x509_msg->serialnumber);
 	if(x509_msg->serialnumber) { free(x509_msg->serialnumber); }
 	if(x509_msg->issuer){ free(x509_msg->issuer); } 
+	t = strlen(x509_msg->issuer);
 	if(x509_msg->subject){ free(x509_msg->subject); } 
+	t = strlen(x509_msg->subject);
 	if(x509_msg->notbefore) { free(x509_msg->notbefore); }
+	t = strlen(x509_msg->notbefore);
 	if(x509_msg->notafter) { free(x509_msg->notafter); }
+	t = strlen(x509_msg->notafter);
 	if(x509_msg->algFlag) { free(x509_msg->algFlag); }
+	t = strlen(x509_msg->algFlag);
 
 	if(x509_msg->ds.y) {free(x509_msg->ds.y);}  
 	if(x509_msg->ds.p) {free(x509_msg->ds.p);} 
@@ -199,7 +179,7 @@ static int parse_algorithm_identifier( signatureAlgorithmIdentifier *target,
 {
   struct asn1struct *oid = ( struct asn1struct * ) source->children;
 
-  if ( !validate_node( oid, ASN1_OBJECT_IDENTIFIER, 0, "algorithm identifier oid" ) )
+  if ( !validate_node( oid, ASN1_OBJECT_IDENTIFIER, 0, "algorithm identifier oid" ) )  // 检查节点信息
   {
     return 2;
   }
@@ -287,7 +267,7 @@ int parse_name( name *target, struct asn1struct *source )
 
     value = ( struct asn1struct * ) type->next;
 
-    if ( !( value->tag == ASN1_PRINTABLE_STRING ||
+    if ( !( value->tag == ASN1_PRINTABLE_STRING ||   //当其所有的都不满足时，错误
             value->tag == ASN1_TELETEX_STRING ||
             value->tag == ASN1_IA5_STRING ||
             value->tag == ASN1_UTF8_STRING ) )
@@ -297,11 +277,13 @@ int parse_name( name *target, struct asn1struct *source )
       return 4;
     }
 
+
+    // 解析OID码的分析
     if ( !memcmp( type->data, OID_idAtCountryName, type->length ) )
     {
       target->idAtCountryName = ( char * ) malloc( value->length + 1 );
       memcpy( target->idAtCountryName, value->data, value->length ); 
-      target->idAtCountryName[ value->length ] = 0; 
+      target->idAtCountryName[ value->length ] = 0; // 最后一字节补0
     }
     else if ( !memcmp( type->data, OID_idAtStateOrProvinceName, type->length ) )
     {
@@ -354,7 +336,7 @@ int parse_name( name *target, struct asn1struct *source )
   return 0;
 } 
 
-static int parse_validity( validity_period *target, struct asn1struct *source )
+static int parse_validity( validity_period *target, struct asn1struct *source )  //解析合法性
 {
   struct asn1struct *not_before;
   struct asn1struct *not_after;
@@ -620,7 +602,7 @@ static int parse_tbs_certificate( x509_certificate *target,
  
   if ( version->tag == 0 && version->tag_class == ASN1_CONTEXT_SPECIFIC )
   {
-    struct asn1struct *versionNumber = 
+     struct asn1struct *versionNumber = 
      ( struct asn1struct * ) version->children;  
 
     if ( !validate_node( versionNumber, ASN1_INTEGER, 0, "version number" ) )
@@ -629,7 +611,7 @@ static int parse_tbs_certificate( x509_certificate *target,
     }
 
     // This will only ever be one byte; safe
-    target->version = ( *versionNumber->data ) + 1;
+    target->version = ( *versionNumber->data ) + 1;    
     serialNumber = ( struct asn1struct * ) version->next;
   } 
   else
@@ -645,18 +627,18 @@ static int parse_tbs_certificate( x509_certificate *target,
   publicKeyInfo = ( struct asn1struct * ) subject->next;
   extensions = ( struct asn1struct * ) publicKeyInfo->next;
  
-  if ( parse_huge( &target->serialNumber, serialNumber ) ) { return 2; }
-  if ( parse_algorithm_identifier( &target->signature, 
+  if ( parse_huge( &target->serialNumber, serialNumber ) ) { return 2; } //解析序列号
+  if ( parse_algorithm_identifier( &target->signature,               //解析算法标识
                    signatureAlgorithmIdentifier ) )
    { return 3; }
-  if ( parse_name( &target->issuer, issuer ) ) { return 4; }
-  if ( parse_validity( &target->validity, validity ) ) { return 5; }
-  if ( parse_name( &target->subject, subject ) ) { return 6; }
-  if ( parse_public_key_info( &target->subjectPublicKeyInfo, publicKeyInfo ) )
+  if ( parse_name( &target->issuer, issuer ) ) { return 4; }             //解析发行者   
+  if ( parse_validity( &target->validity, validity ) ) { return 5; }    //解析有效期
+  if ( parse_name( &target->subject, subject ) ) { return 6; }          //解析主体信息
+  if ( parse_public_key_info( &target->subjectPublicKeyInfo, publicKeyInfo ) )  //解析公钥信息
    { return 7; }
   if ( extensions )
   {
-    if ( parse_extensions( target, extensions ) ) { return 8; }
+    if ( parse_extensions( target, extensions ) ) { return 8; }   //解析扩展信息
   }
   
   return 0;
@@ -751,7 +733,7 @@ static int parse_dsa_signature_value( signed_x509_certificate *target,
 
 int parse_x509_certificate( const unsigned char *buffer,
               const unsigned int certificate_length,
-              signed_x509_certificate *parsed_certificate )
+              signed_x509_certificate *parsed_certificate )   // 正确的返回0, 错误的返回42。
 {
   struct asn1struct certificate;
   struct asn1struct *tbsCertificate;
@@ -760,20 +742,20 @@ int parse_x509_certificate( const unsigned char *buffer,
   digest_ctx digest;
 
   // First, read the whole thing into a traversable ASN.1 structure
-  asn1parse( buffer, certificate_length, &certificate );
+  asn1parse( buffer, certificate_length, &certificate );  
 
   // Version can be implicit or explicit
-  tbsCertificate = ( struct asn1struct * ) certificate.children;
+  tbsCertificate = ( struct asn1struct * ) certificate.children;       //解析第一块证书主体内容
 
-  algorithmIdentifier = ( struct asn1struct * ) tbsCertificate->next;
-  signatureValue = ( struct asn1struct * ) algorithmIdentifier->next;
-  if ( parse_tbs_certificate( &parsed_certificate->tbsCertificate, 
+  algorithmIdentifier = ( struct asn1struct * ) tbsCertificate->next;  //算法标志
+  signatureValue = ( struct asn1struct * ) algorithmIdentifier->next;  //第三块签名的值
+  if ( parse_tbs_certificate( &parsed_certificate->tbsCertificate,     //解析证书主体
      tbsCertificate ) )
   { 
     fprintf( stderr, "Error trying to parse TBS certificate\n" );
     return 42;
   }
-  if ( parse_algorithm_identifier( &parsed_certificate->algorithm, 
+  if ( parse_algorithm_identifier( &parsed_certificate->algorithm,    //解析算法标志
                   algorithmIdentifier ) )
   {
     return 42;
@@ -783,7 +765,7 @@ int parse_x509_certificate( const unsigned char *buffer,
   {
    case md5WithRSAEncryption:
    case shaWithRSAEncryption:
-     if ( parse_rsa_signature_value( parsed_certificate, signatureValue ) )
+     if ( parse_rsa_signature_value( parsed_certificate, signatureValue ) )    //解析签名值
      {
        return 42;
      }
@@ -798,7 +780,7 @@ int parse_x509_certificate( const unsigned char *buffer,
   switch ( parsed_certificate->algorithm )
   {
     case md5WithRSAEncryption:
-      new_md5_digest( &digest );
+      new_md5_digest( &digest ); // 对digest进行初始化
       break;
     case shaWithRSAEncryption:
     case shaWithDSA:
@@ -1011,17 +993,60 @@ static void print_huge2( huge *h, char *str)
 
 void display_x509( signed_x509_certificate *certificate, x509Info *x509_msg)
 {
-
+    int len = 0;
 	printf( "Version: %d\n", certificate->tbsCertificate.version );
-	sprintf(x509_msg->version, "Version: %d\r\n", certificate->tbsCertificate.version);
+	len = strlen( "Version: %d\n");
+    x509_msg->version = (char*)malloc(len+1);
+	x509_msg->version[len] = 0;  //写入的是6个字符+1个结束符
+	sprintf(x509_msg->version, "Version: %d\n", certificate->tbsCertificate.version);
 
 	printf( "Serial number: " );
+	len = certificate->tbsCertificate.serialNumber.size * 2;
+	x509_msg->serialnumber = (char*)malloc(len+1);
+    x509_msg->serialnumber[len] = 0;
 	print_huge2( &certificate->tbsCertificate.serialNumber,x509_msg->serialnumber);
 
 	printf( "issuer: " );
 	output_x500_name( &certificate->tbsCertificate.issuer );
 	name *x500_name;
 	x500_name = &certificate->tbsCertificate.issuer;
+ 
+    len = 0;
+    if(x500_name->idAtCountryName)
+	{
+		len += strlen(x500_name->idAtCountryName);
+	}
+    if(x500_name->idAtStateOrProvinceName)
+	{
+		len += strlen(x500_name->idAtStateOrProvinceName);
+	}
+
+    if(x500_name->idAtLocalityName)
+	{
+		len += strlen(x500_name->idAtLocalityName);
+	}
+
+   if(x500_name->idAtOrganizationName)
+   {
+       len += strlen(x500_name->idAtOrganizationName);
+   }
+   
+   if(x500_name->idAtOrganizationalUnitName)
+   {
+	   len += strlen(x500_name->idAtOrganizationalUnitName);
+   }
+
+   if(x500_name->idAtCommonName)
+   {
+     len += strlen(x500_name->idAtCommonName);
+   }
+
+     len += strlen( " C=%s\r\n ST=%s\r\n L=%s\r\n O=%s\r\n OU=%s\r\n CN=%s\r\n");
+
+
+	x509_msg->issuer = (char*) malloc(len+1);
+	x509_msg->issuer[len] = 0;
+
 	sprintf(x509_msg->issuer, " C=%s\r\n ST=%s\r\n L=%s\r\n O=%s\r\n OU=%s\r\n CN=%s\r\n",
 		( x500_name->idAtCountryName ? x500_name->idAtCountryName : "?" ),
 		( x500_name->idAtStateOrProvinceName ? x500_name->idAtStateOrProvinceName : "?" ),
@@ -1034,6 +1059,41 @@ void display_x509( signed_x509_certificate *certificate, x509Info *x509_msg)
 	printf( "subject : " );
 	output_x500_name( &certificate->tbsCertificate.subject );
 	x500_name = &certificate->tbsCertificate.subject;
+
+	len = 0;
+	if(x500_name->idAtCountryName)
+	{
+		len += strlen(x500_name->idAtCountryName);
+	}
+	if(x500_name->idAtStateOrProvinceName)
+	{
+		len += strlen(x500_name->idAtStateOrProvinceName);
+	}
+
+	if(x500_name->idAtLocalityName)
+	{
+		len += strlen(x500_name->idAtLocalityName);
+	}
+
+	if(x500_name->idAtOrganizationName)
+	{
+		len += strlen(x500_name->idAtOrganizationName);
+	}
+
+	if(x500_name->idAtOrganizationalUnitName)
+	{
+		len += strlen(x500_name->idAtOrganizationalUnitName);
+	}
+
+	if(x500_name->idAtCommonName)
+	{
+		len += strlen(x500_name->idAtCommonName)+1;
+	}
+	len += strlen( " C=%s\r\n ST=%s\r\n L=%s\r\n O=%s\r\n OU=%s\r\n CN=%s\r\n");
+
+	x509_msg->subject = (char*) malloc(len + 1);
+	x509_msg->subject[len] = 0;
+
 	sprintf(x509_msg->subject, " C=%s\r\n ST=%s\r\n L=%s\r\n O=%s\r\n OU=%s\r\n CN=%s\r\n",
 		( x500_name->idAtCountryName ? x500_name->idAtCountryName : "?" ),
 		( x500_name->idAtStateOrProvinceName ? x500_name->idAtStateOrProvinceName : "?" ),
@@ -1042,44 +1102,77 @@ void display_x509( signed_x509_certificate *certificate, x509Info *x509_msg)
 		( x500_name->idAtOrganizationalUnitName ? x500_name->idAtOrganizationalUnitName : "?" ),
 		( x500_name->idAtCommonName ? x500_name->idAtCommonName : "?" ) );
 
-	printf( "not before: %s", asctime( gmtime(
+
+
+	printf( "%s", asctime( gmtime(
 		&certificate->tbsCertificate.validity.notBefore ) ) );
-	sprintf(x509_msg->notbefore,"Not before: %s\r\n", asctime( gmtime(
+	len = 30;
+	x509_msg->notbefore = (char*) malloc(len + 1);
+	x509_msg->notbefore[len] = 0;
+	sprintf(x509_msg->notbefore,"%s\r\n", asctime( gmtime(
 		&certificate->tbsCertificate.validity.notBefore ) ) );
 
-	printf( "not after: %s", asctime( gmtime(
+	printf( "%s", asctime( gmtime(
 		&certificate->tbsCertificate.validity.notAfter ) ) );
-	sprintf(x509_msg->notafter, "Not after: %s\r\n", asctime( gmtime(
+    len = 30;
+	x509_msg->notafter = (char*) malloc(len + 1);
+	x509_msg->notafter[len] = 0;
+	sprintf(x509_msg->notafter, "%s\r\n", asctime( gmtime(
 		&certificate->tbsCertificate.validity.notAfter ) ) );
 
 	printf( "Public key algorithm: " );
-
 	switch ( certificate->tbsCertificate.subjectPublicKeyInfo.algorithm )
 	{
 	case rsa:
 		printf( "RSA\n" );
+		len = 4;
+		x509_msg->algFlag = (char *)malloc(len+1);
+		x509_msg->algFlag[len] = 0;
 		sprintf(x509_msg->algFlag, "RSA");
 		printf( "modulus: " );
+
+		len = certificate->tbsCertificate.subjectPublicKeyInfo.rsa_public_key.modulus->size * 2;
+        x509_msg->rs.modulus =(char *) malloc(len+1);
+		x509_msg->rs.modulus[len] = 0;
 		print_huge2( 
 			certificate->tbsCertificate.subjectPublicKeyInfo.rsa_public_key.modulus ,x509_msg->rs.modulus);
 
 		printf( "exponent: " );
+		 len  = certificate->tbsCertificate.subjectPublicKeyInfo.rsa_public_key.exponent->size * 2;
+		x509_msg->rs.exponent = (char *) malloc(len+ 1);
+	   	x509_msg->rs.exponent[len] = 0;
+		
 		print_huge2( 
 			certificate->tbsCertificate.subjectPublicKeyInfo.rsa_public_key.exponent,x509_msg->rs.exponent);
 		break;
 	case dsa:
 		printf( "DSA\n" );
+		len = 4;
+		x509_msg->algFlag = (char *)malloc(len+1);
+		x509_msg->algFlag[len] = 0;
 		sprintf(x509_msg->algFlag, "DSA");
 		printf( "y: " );
+		len = certificate->tbsCertificate.subjectPublicKeyInfo.dsa_public_key.size * 2;
+		x509_msg->ds.y = (char *)malloc(len + 1);
+		x509_msg->ds.y[len] = 0;
 		print_huge2( 
 			&certificate->tbsCertificate.subjectPublicKeyInfo.dsa_public_key,x509_msg->ds.y );
 		printf( "p: " );
+		len = certificate->tbsCertificate.subjectPublicKeyInfo.dsa_parameters.p.size * 2;
+		x509_msg->ds.p = (char *)malloc( len + 1);
+		x509_msg->ds.p[len] = 0;
 		print_huge2( 
 			&certificate->tbsCertificate.subjectPublicKeyInfo.dsa_parameters.p,x509_msg->ds.p);
 		printf( "q: " );
+		len = certificate->tbsCertificate.subjectPublicKeyInfo.dsa_parameters.q.size * 2;
+		x509_msg->ds.q = (char *)malloc( len + 1);
+		x509_msg->ds.q[len] = 0;
 		print_huge2( 
 			&certificate->tbsCertificate.subjectPublicKeyInfo.dsa_parameters.q ,x509_msg->ds.q);
 		printf( "g: " );
+		len = certificate->tbsCertificate.subjectPublicKeyInfo.dsa_parameters.g.size*2;
+		x509_msg->ds.g =(char *) malloc(len + 1);
+		x509_msg->ds.g[len] = 0;
 		print_huge2( 
 			&certificate->tbsCertificate.subjectPublicKeyInfo.dsa_parameters.g ,x509_msg->ds.g);
 		break;
@@ -1092,6 +1185,9 @@ void display_x509( signed_x509_certificate *certificate, x509Info *x509_msg)
 	}
 
 	printf( "Signature algorithm: " );
+	len = 60;
+	x509_msg->signAlgorithm = (char *)malloc(len+ 1);
+	x509_msg->signAlgorithm[len] = 0;
 	switch ( certificate->algorithm )
 	{
 	case md5WithRSAEncryption:
@@ -1114,32 +1210,44 @@ void display_x509( signed_x509_certificate *certificate, x509Info *x509_msg)
 	{
 	case md5WithRSAEncryption:
 	case shaWithRSAEncryption:
+		len = certificate->rsa_signature_value.size * 2 ;
+         x509_msg->rs.signValue = (char *) malloc( len + 1);
+		 x509_msg->rs.signValue[len] = 0;
 		print_huge2( &certificate->rsa_signature_value,x509_msg->rs.signValue);
 		break;
 	case shaWithDSA:
 		printf( "\n\tr:" );
+		len = certificate->dsa_signature_value.r.size * 2;
+        x509_msg->ds.r = (char *)malloc( len + 1);
+		x509_msg->ds.r[len] = 0;
 		print_huge2( &certificate->dsa_signature_value.r ,x509_msg->ds.r);
 		printf( "\ts:" );
+		len = certificate->dsa_signature_value.s.size * 2;
+		x509_msg->ds.s = (char *)malloc(len + 1);
+		x509_msg->ds.s[len] = 0;
 		print_huge2( &certificate->dsa_signature_value.s, x509_msg->ds.s);
 		break;
 	}
 	printf( "\n" );
 
+
+
+
+     len = 30;
+	x509_msg->caflag = (char *)malloc(len + 1);
+	x509_msg->caflag[len] = 0;
 	if ( certificate->tbsCertificate.certificate_authority )
 	{
 		printf( "is a CA\n" );
-		sprintf(x509_msg->caflag, "is a CA\n");
+		sprintf(x509_msg->caflag, "This is a CA\n");
 	} 
 	else
 	{
 		printf( "is not a CA\n" );
-	  sprintf(x509_msg->caflag, "is not a CA\n");
+	  sprintf(x509_msg->caflag, "This is not a CA\n");
 	} 
 
 } 
-
-
-
 
 
 #ifdef TEST_X509
