@@ -43,7 +43,7 @@ int asn1parse( const unsigned char *buffer,
        tag <<= 8;
        tag |= *ptr & 0x7F;
      }
-    }
+   }
 
     tag_length_byte = *ptr;
     ptr++;
@@ -89,8 +89,6 @@ int asn1parse( const unsigned char *buffer,
         malloc( sizeof( struct asn1struct ) );
 
       asn1parse( ptr, tag_length, token->children );
-
-
     }
 
     ptr += tag_length;

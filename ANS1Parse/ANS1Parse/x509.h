@@ -89,12 +89,51 @@ typedef struct
 } 
 signed_x509_certificate;
 
+
+
+typedef struct 
+{ 
+
+  char *modulus;
+  char *exponent;
+  char *signValue;
+}ras_info;
+
+typedef struct 
+{
+  char *y;
+  char *p;
+  char *q;
+  char *g;
+  char *r;
+  char *s;
+}dsa_info;
+
+typedef struct  
+{
+  char* version;
+  char* serialnumber;
+  char* issuer;
+  char* subject;
+  char* notbefore;
+  char* notafter;
+  char* algFlag;
+  dsa_info ds;
+  ras_info rs;
+  char *signAlgorithm;
+  char *caflag;
+}x509Info;
+
+
 void init_x509_certificate( signed_x509_certificate *certificate );
+void init_x509_msg(x509Info * x509_msg);
+void free_x509_msg(x509Info * x509_msg);
 int parse_x509_certificate( const unsigned char *buffer,
               const unsigned int certificate_length,
               signed_x509_certificate *parsed_certificate );
 void free_x509_certificate( signed_x509_certificate *certificate );
 void display_x509_certificate( signed_x509_certificate *certificate, CString& str);
+void display_x509(signed_x509_certificate *certificate, x509Info * x509);
 int validate_certificate_rsa( signed_x509_certificate *certificate, rsa_key *public_key );
 int validate_certificate_dsa( signed_x509_certificate *certificate );
 #endif

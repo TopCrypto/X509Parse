@@ -51,6 +51,19 @@ void show_hex_str( const unsigned char *array, int length , CString& str)
 }
 
 
+void show_hex_char( const unsigned char *array, int length , char*str)
+{
+	while ( length-- )
+	{
+	  sprintf(str++,"%.02x",  *array++);
+	  str++;
+	}
+	*str = '\0';
+}
+
+
+
+
 void show_hex( const unsigned char *array, int length)
 {
 

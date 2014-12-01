@@ -82,6 +82,72 @@ void init_x509_certificate( signed_x509_certificate *certificate )
   certificate->tbsCertificate.certificate_authority = 0;
 }
 
+
+void init_x509_msg(x509Info * x509_msg)
+{
+
+	//memset( &certificate->tbsCertificate.issuer, 0, sizeof( name ) );
+	////memset( &certificate->tbsCertificate.subject, 0, sizeof( name ) );
+
+
+  x509_msg->version = (char*) malloc(200);
+  x509_msg->serialnumber = (char*)malloc(200);
+  x509_msg->issuer = (char *)malloc(200);
+  x509_msg->subject = (char*)malloc(200);
+  x509_msg->notbefore = (char*)malloc(200);
+  x509_msg->notafter = (char*)malloc(200);
+  x509_msg->algFlag = (char*)malloc(200);
+  
+  memset(&x509_msg->ds, 0, sizeof(dsa_info));
+  
+  x509_msg->ds.y = (char*)malloc(200);
+  x509_msg->ds.p = (char*)malloc(200);
+  x509_msg->ds.q = (char*)malloc(200);
+  x509_msg->ds.g = (char*)malloc(200);
+  x509_msg->ds.r = (char*)malloc(200);
+  x509_msg->ds.s = (char*)malloc(200);
+  
+  memset(&x509_msg->rs, 0, sizeof(ras_info));
+  x509_msg->rs.exponent = (char *)malloc(200);
+  x509_msg->rs.modulus = (char *)malloc(600);
+  x509_msg->rs.signValue = (char *)malloc(600);
+
+  x509_msg->signAlgorithm = (char *)malloc(200);
+  x509_msg->caflag = (char *)malloc(200);
+}
+
+
+void free_x509_msg(x509Info * x509_msg)
+{
+	if(x509_msg->version)
+	{ 
+		free(x509_msg->version); 
+	}
+	if(x509_msg->serialnumber) { free(x509_msg->serialnumber); }
+	if(x509_msg->issuer){ free(x509_msg->issuer); } 
+	if(x509_msg->subject){ free(x509_msg->subject); } 
+	if(x509_msg->notbefore) { free(x509_msg->notbefore); }
+	if(x509_msg->notafter) { free(x509_msg->notafter); }
+	if(x509_msg->algFlag) { free(x509_msg->algFlag); }
+
+	if(x509_msg->ds.y) {free(x509_msg->ds.y);}  
+	if(x509_msg->ds.p) {free(x509_msg->ds.p);} 
+	if(x509_msg->ds.q) {free(x509_msg->ds.q);} 
+	if(x509_msg->ds.g) {free(x509_msg->ds.g);} 
+	if(x509_msg->ds.r) {free(x509_msg->ds.r);} 
+	if(x509_msg->ds.s) {free(x509_msg->ds.s);}
+
+	if(x509_msg->rs.exponent) {free(x509_msg->rs.exponent);} 
+	if(x509_msg->rs.modulus) {free(x509_msg->rs.modulus);} 
+	if(x509_msg->rs.signValue){free(x509_msg->rs.signValue);} 
+
+	if(x509_msg->signAlgorithm) { free(x509_msg->signAlgorithm); }
+	if(x509_msg->caflag ){ free(x509_msg->caflag); }
+}
+
+
+
+
 static void free_x500_name( name *x500_name )
 {
   if ( x500_name->idAtCountryName ) { free( x500_name->idAtCountryName ); }
@@ -769,6 +835,15 @@ static void print_huge( huge *h, CString& str)
   show_hex_str( h->rep, h->size, str);
 }
 
+
+static void print_huge2( huge *h, char *str)
+{
+	show_hex_char( h->rep, h->size, str);
+}
+
+
+
+
  void display_x509_certificate( signed_x509_certificate *certificate, CString& str)
 {
 
@@ -931,6 +1006,141 @@ static void print_huge( huge *h, CString& str)
   } 
 
 } 
+
+
+
+void display_x509( signed_x509_certificate *certificate, x509Info *x509_msg)
+{
+
+	printf( "Version: %d\n", certificate->tbsCertificate.version );
+	sprintf(x509_msg->version, "Version: %d\r\n", certificate->tbsCertificate.version);
+
+	printf( "Serial number: " );
+	print_huge2( &certificate->tbsCertificate.serialNumber,x509_msg->serialnumber);
+
+	printf( "issuer: " );
+	output_x500_name( &certificate->tbsCertificate.issuer );
+	name *x500_name;
+	x500_name = &certificate->tbsCertificate.issuer;
+	sprintf(x509_msg->issuer, " C=%s\r\n ST=%s\r\n L=%s\r\n O=%s\r\n OU=%s\r\n CN=%s\r\n",
+		( x500_name->idAtCountryName ? x500_name->idAtCountryName : "?" ),
+		( x500_name->idAtStateOrProvinceName ? x500_name->idAtStateOrProvinceName : "?" ),
+		( x500_name->idAtLocalityName ? x500_name->idAtLocalityName : "?" ),
+		( x500_name->idAtOrganizationName ? x500_name->idAtOrganizationName : "?" ),
+		( x500_name->idAtOrganizationalUnitName ? x500_name->idAtOrganizationalUnitName : "?" ),
+		( x500_name->idAtCommonName ? x500_name->idAtCommonName : "?" ) );
+
+
+	printf( "subject : " );
+	output_x500_name( &certificate->tbsCertificate.subject );
+	x500_name = &certificate->tbsCertificate.subject;
+	sprintf(x509_msg->subject, " C=%s\r\n ST=%s\r\n L=%s\r\n O=%s\r\n OU=%s\r\n CN=%s\r\n",
+		( x500_name->idAtCountryName ? x500_name->idAtCountryName : "?" ),
+		( x500_name->idAtStateOrProvinceName ? x500_name->idAtStateOrProvinceName : "?" ),
+		( x500_name->idAtLocalityName ? x500_name->idAtLocalityName : "?" ),
+		( x500_name->idAtOrganizationName ? x500_name->idAtOrganizationName : "?" ),
+		( x500_name->idAtOrganizationalUnitName ? x500_name->idAtOrganizationalUnitName : "?" ),
+		( x500_name->idAtCommonName ? x500_name->idAtCommonName : "?" ) );
+
+	printf( "not before: %s", asctime( gmtime(
+		&certificate->tbsCertificate.validity.notBefore ) ) );
+	sprintf(x509_msg->notbefore,"Not before: %s\r\n", asctime( gmtime(
+		&certificate->tbsCertificate.validity.notBefore ) ) );
+
+	printf( "not after: %s", asctime( gmtime(
+		&certificate->tbsCertificate.validity.notAfter ) ) );
+	sprintf(x509_msg->notafter, "Not after: %s\r\n", asctime( gmtime(
+		&certificate->tbsCertificate.validity.notAfter ) ) );
+
+	printf( "Public key algorithm: " );
+
+	switch ( certificate->tbsCertificate.subjectPublicKeyInfo.algorithm )
+	{
+	case rsa:
+		printf( "RSA\n" );
+		sprintf(x509_msg->algFlag, "RSA");
+		printf( "modulus: " );
+		print_huge2( 
+			certificate->tbsCertificate.subjectPublicKeyInfo.rsa_public_key.modulus ,x509_msg->rs.modulus);
+
+		printf( "exponent: " );
+		print_huge2( 
+			certificate->tbsCertificate.subjectPublicKeyInfo.rsa_public_key.exponent,x509_msg->rs.exponent);
+		break;
+	case dsa:
+		printf( "DSA\n" );
+		sprintf(x509_msg->algFlag, "DSA");
+		printf( "y: " );
+		print_huge2( 
+			&certificate->tbsCertificate.subjectPublicKeyInfo.dsa_public_key,x509_msg->ds.y );
+		printf( "p: " );
+		print_huge2( 
+			&certificate->tbsCertificate.subjectPublicKeyInfo.dsa_parameters.p,x509_msg->ds.p);
+		printf( "q: " );
+		print_huge2( 
+			&certificate->tbsCertificate.subjectPublicKeyInfo.dsa_parameters.q ,x509_msg->ds.q);
+		printf( "g: " );
+		print_huge2( 
+			&certificate->tbsCertificate.subjectPublicKeyInfo.dsa_parameters.g ,x509_msg->ds.g);
+		break;
+	case dh:
+		printf( "DH\n" );
+		break;
+	default:
+		printf( "?\n" );
+		break;
+	}
+
+	printf( "Signature algorithm: " );
+	switch ( certificate->algorithm )
+	{
+	case md5WithRSAEncryption:
+		printf( "MD5 with RSA Encryption\n" );
+		sprintf(x509_msg->signAlgorithm, "MD5 with RSA Encryption\n");
+		break;
+	case shaWithDSA:
+		printf( "SHA-1 with DSA\n" );
+	    sprintf(x509_msg->signAlgorithm, "SHA-1 with DSA\n");
+		break;
+	case shaWithRSAEncryption:
+		printf( "SHA-1 with RSA Encryption\n" );
+	    sprintf(x509_msg->signAlgorithm, "SHA-1 with RSA Encryption\n");
+		break;
+	}
+
+	printf( "Signature value: " );
+
+	switch ( certificate->algorithm )
+	{
+	case md5WithRSAEncryption:
+	case shaWithRSAEncryption:
+		print_huge2( &certificate->rsa_signature_value,x509_msg->rs.signValue);
+		break;
+	case shaWithDSA:
+		printf( "\n\tr:" );
+		print_huge2( &certificate->dsa_signature_value.r ,x509_msg->ds.r);
+		printf( "\ts:" );
+		print_huge2( &certificate->dsa_signature_value.s, x509_msg->ds.s);
+		break;
+	}
+	printf( "\n" );
+
+	if ( certificate->tbsCertificate.certificate_authority )
+	{
+		printf( "is a CA\n" );
+		sprintf(x509_msg->caflag, "is a CA\n");
+	} 
+	else
+	{
+		printf( "is not a CA\n" );
+	  sprintf(x509_msg->caflag, "is not a CA\n");
+	} 
+
+} 
+
+
+
+
 
 #ifdef TEST_X509
 int main( int argc, char *argv[ ] )

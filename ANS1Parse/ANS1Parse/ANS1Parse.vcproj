@@ -202,6 +202,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DataCode.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\digest.cpp"
 				>
 			</File>
@@ -215,6 +219,10 @@
 			</File>
 			<File
 				RelativePath=".\huge.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ListCtrol.cpp"
 				>
 			</File>
 			<File
@@ -276,6 +284,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DataCode.h"
+				>
+			</File>
+			<File
 				RelativePath=".\digest.h"
 				>
 			</File>
@@ -289,6 +301,10 @@
 			</File>
 			<File
 				RelativePath=".\huge.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ListCtrol.h"
 				>
 			</File>
 			<File

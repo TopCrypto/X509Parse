@@ -3,6 +3,7 @@
 
 #pragma once
 #include "afxwin.h"
+#include "afxcmn.h"
 
 
 // CANS1ParseDlg ¶Ô»°¿ò
@@ -34,4 +35,10 @@ public:
 	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedButton2();
 	CEdit m_edit;
+	void GetCertInfo();
+    void ShowData(char pTempData[][600]);
+
+
+	CListCtrl m_listCtrl;
+	afx_msg void OnLvnItemchangedList2(NMHDR *pNMHDR, LRESULT *pResult);
 };
