@@ -1128,18 +1128,15 @@ void display_x509( signed_x509_certificate *certificate, x509Info *x509_msg)
 	if ( certificate->tbsCertificate.certificate_authority )
 	{
 		printf( "is a CA\n" );
-		sprintf(x509_msg->caflag, "is a CA\n");
+		sprintf(x509_msg->caflag, "This is a CA\n");
 	} 
 	else
 	{
 		printf( "is not a CA\n" );
-	  sprintf(x509_msg->caflag, "is not a CA\n");
+	  sprintf(x509_msg->caflag, "This is not a CA\n");
 	} 
 
 } 
-
-
-
 
 
 #ifdef TEST_X509

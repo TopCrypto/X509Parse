@@ -239,6 +239,7 @@ void CANS1ParseDlg::GetCertInfo()
 	//CString csMsg;
 	signed_x509_certificate certificate;
 	SetDlgItemText(IDC_EDIT1, "");
+    m_listCtrl.DeleteAllItems(); 
 	x509Info x509_msg;
 
 	// now parse it
