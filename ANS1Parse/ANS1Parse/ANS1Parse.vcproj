@@ -222,10 +222,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ListCtrol.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\md5.cpp"
 				>
 			</File>
@@ -301,10 +297,6 @@
 			</File>
 			<File
 				RelativePath=".\huge.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ListCtrol.h"
 				>
 			</File>
 			<File

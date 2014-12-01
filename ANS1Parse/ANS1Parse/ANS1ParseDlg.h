@@ -4,7 +4,7 @@
 #pragma once
 #include "afxwin.h"
 #include "afxcmn.h"
-
+#include "x509.h"
 
 // CANS1ParseDlg ¶Ô»°¿ò
 class CANS1ParseDlg : public CDialog
@@ -32,13 +32,11 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedButton2();
 	CEdit m_edit;
+    void ListCtrShow(x509Info *x509_msg);
 	void GetCertInfo();
-    void ShowData(char pTempData[][600]);
-
-
+   
 	CListCtrl m_listCtrl;
 	afx_msg void OnLvnItemchangedList2(NMHDR *pNMHDR, LRESULT *pResult);
 };

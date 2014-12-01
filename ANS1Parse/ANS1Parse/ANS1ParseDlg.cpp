@@ -5,14 +5,18 @@
 #include  "ANS1Parse.h"
 #include  "ANS1ParseDlg.h"
 #include  "x509.h"
-#include "ListCtrol.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-char ItemName[12][300] =
+#define MAX_COLUMN_NUM    12
+#define MAX_COLUMN_LENGTH 512+1
+#define MAX_SHOW_CHAR     512+1
+
+char ItemName[12][30] =
 {
 	{"版本"},
 	{"序列号"},
@@ -27,11 +31,6 @@ char ItemName[12][300] =
 	{"签名算法"},
 	{"证书类别"}
 };
-
-
-
-
-
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
 class CAboutDlg : public CDialog
@@ -86,7 +85,6 @@ BEGIN_MESSAGE_MAP(CANS1ParseDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	//}}AFX_MSG_MAP
-	ON_BN_CLICKED(IDC_BUTTON1, &CANS1ParseDlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, &CANS1ParseDlg::OnBnClickedButton2)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST2, &CANS1ParseDlg::OnLvnItemchangedList2)
 END_MESSAGE_MAP()
@@ -122,14 +120,10 @@ BOOL CANS1ParseDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-    char LogColumn[13][300] = 
-	{
-		{"字段"},
-		{"值      "}
-	};
-
-	vCreateCtrlList(&m_listCtrl);
-	vCreateCtrlListColumn(&m_listCtrl, LogColumn, 2);
+    m_listCtrl.SetExtendedStyle(LVS_EX_FLATSB|LVS_EX_FULLROWSELECT|LVS_EX_HEADERDRAGDROP|
+		LVS_EX_ONECLICKACTIVATE|LVS_EX_GRIDLINES);
+    m_listCtrl.InsertColumn(0, "字段", LVCFMT_LEFT, 150);
+	m_listCtrl.InsertColumn(1, "成绩", LVCFMT_LEFT, 150);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -183,125 +177,39 @@ HCURSOR CANS1ParseDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
-
-void SetData(x509Info* x509_msg, char pData[13][600])
+void CANS1ParseDlg::ListCtrShow(x509Info* x509_msg)
 {
 
-  memset(pData,0, sizeof(pData));
+    char pData[MAX_COLUMN_NUM][MAX_COLUMN_LENGTH];
+	CString str;
 
 
-   memcpy(&pData[0][0], x509_msg->version, strlen(x509_msg->version) + 1);
-   memcpy(&pData[1][0], x509_msg->serialnumber, strlen(x509_msg->serialnumber) + 1);
+	memset(pData,0, sizeof(pData));
 
-   memcpy(&pData[2][0], x509_msg->issuer, strlen(x509_msg->issuer) + 1);
-   memcpy(&pData[3][0], x509_msg->subject , strlen(x509_msg->subject ) + 1);
-
-   memcpy(&pData[4][0], x509_msg->notbefore , strlen(x509_msg->notbefore ) + 1);
-   memcpy(&pData[5][0], x509_msg->notafter, strlen(x509_msg->notafter) + 1);
-
-   memcpy(&pData[6][0], x509_msg->algFlag, strlen(x509_msg->algFlag) + 1);
-   memcpy(&pData[7][0], x509_msg->rs.exponent , strlen(x509_msg->rs.exponent ) + 1);
-
-   memcpy(&pData[8][0], x509_msg->rs.modulus , strlen(x509_msg->rs.modulus ) + 1);
-   memcpy(&pData[9][0], x509_msg->rs.signValue, strlen(x509_msg->rs.signValue) + 1);
-
-   memcpy(&pData[10][0], x509_msg->signAlgorithm , strlen(x509_msg->signAlgorithm ) + 1);
-   memcpy(&pData[11][0], x509_msg->caflag, strlen(x509_msg->caflag) + 1);
-}
-
-void CANS1ParseDlg::ShowData(char pTempData[][600])
-{
- 
-  CString str;
-  for(int i = 0; i< 12; i++)
-  {
-  
-    str = (CString)&ItemName[i][0];
-    m_listCtrl.InsertItem(i,str,i);
-	str = (CString)&pTempData[i][0];
-	m_listCtrl.SetItemText(i,1, str);
-  }
+	memcpy(&pData[0][0], x509_msg->version, strlen(x509_msg->version) + 1);
+	memcpy(&pData[1][0], x509_msg->serialnumber, strlen(x509_msg->serialnumber) + 1);
+	memcpy(&pData[2][0], x509_msg->issuer, strlen(x509_msg->issuer) + 1);
+	memcpy(&pData[3][0], x509_msg->subject , strlen(x509_msg->subject ) + 1);
+	memcpy(&pData[4][0], x509_msg->notbefore , strlen(x509_msg->notbefore ) + 1);
+	memcpy(&pData[5][0], x509_msg->notafter, strlen(x509_msg->notafter) + 1);
+	memcpy(&pData[6][0], x509_msg->algFlag, strlen(x509_msg->algFlag) + 1);
+	memcpy(&pData[7][0], x509_msg->rs.exponent , strlen(x509_msg->rs.exponent ) + 1);
+	memcpy(&pData[8][0], x509_msg->rs.modulus , strlen(x509_msg->rs.modulus ) + 1);
+	memcpy(&pData[9][0], x509_msg->rs.signValue, strlen(x509_msg->rs.signValue) + 1);
+	memcpy(&pData[10][0], x509_msg->signAlgorithm , strlen(x509_msg->signAlgorithm ) + 1);
+	memcpy(&pData[11][0], x509_msg->caflag, strlen(x509_msg->caflag) + 1);
 
 
-}
-
-
-
-void CANS1ParseDlg::OnBnClickedButton1()
-{
-	// TODO: Add your control notification handler code here
-	CFile fp;	
-	if(!(fp.Open((LPCTSTR)m_strFilePath.GetBuffer(m_strFilePath.GetLength()),	//open
-		CFile::modeReadWrite | CFile::modeCreate | CFile::modeNoTruncate ))
-		)
+	for(int i = 0; i < sizeof(ItemName) / sizeof(ItemName[0]); i++)
 	{
-		MessageBox("Open File Fail");
-		return;
-	}
-	fp.SeekToEnd();					//file pointer to the end
-	DWORD fplength = (DWORD)fp.GetLength();	//get file data length
-	UCHAR *FileDataBuffer = new UCHAR[fplength * 2 + 1];
-	UCHAR *pTempHeader=FileDataBuffer,*pTempTail=FileDataBuffer;
-	int i=0;
-	memset(FileDataBuffer, 0x00, fplength * 2 + 1);
-	fp.SeekToBegin();
-	UINT len = fp.Read(FileDataBuffer, fplength);	//read data for data length
-	fp.Close();		//close file
-    
+		str = (CString)&ItemName[i][0];
+		m_listCtrl.InsertItem(i,str,i);
 
-	int error_code;
-    CString csMsg;
-	signed_x509_certificate certificate;
-    SetDlgItemText(IDC_EDIT1, "");
-    x509Info x509_msg;
-
-	// now parse it
-	init_x509_certificate( &certificate );
-	init_x509_msg(&x509_msg);
-
-	if ( !( error_code = parse_x509_certificate( FileDataBuffer, len, &certificate ) ) )
-	{
-		printf( "X509 Certificate:\n" );
-		display_x509_certificate( &certificate, csMsg);
-        display_x509(&certificate, &x509_msg);     
-
-
-		// Assume it's a self-signed certificate and try to validate it that
-		switch ( certificate.algorithm )
-		{
-		case md5WithRSAEncryption:
-		case shaWithRSAEncryption:
-			if ( validate_certificate_rsa( &certificate,
-				&certificate.tbsCertificate.subjectPublicKeyInfo.rsa_public_key ) )
-			{
-				printf( "Certificate is a valid self-signed certificate.\n" );
-			}
-			else
-			{
-				printf( "Certificate is corrupt or not self-signed.\n" );
-			}
-			break;
-		case shaWithDSA:
-			if ( validate_certificate_dsa( &certificate ) )
-			{
-				printf( "Certificate is a valid self-signed certificate.\n" );
-			}
-			else
-			{
-				printf( "Certificate is corrupt or not self-signed.\n" );
-			}
-		}
+		str = (CString)&pData[i][0];
+		m_listCtrl.SetItemText(i,1, str);
 	}
 
 
-	//m_edit.ReplaceSel(csMsg);
-    char pTempData[13][600];
-    SetData(&x509_msg, pTempData);
-	ShowData(pTempData);
-
-	free_x509_certificate(&certificate);
-	free_x509_msg(&x509_msg);	
 }
 
 
@@ -328,7 +236,7 @@ void CANS1ParseDlg::GetCertInfo()
 
 
 	int error_code;
-	CString csMsg;
+	//CString csMsg;
 	signed_x509_certificate certificate;
 	SetDlgItemText(IDC_EDIT1, "");
 	x509Info x509_msg;
@@ -340,7 +248,7 @@ void CANS1ParseDlg::GetCertInfo()
 	if ( !( error_code = parse_x509_certificate( FileDataBuffer, len, &certificate ) ) )
 	{
 		printf( "X509 Certificate:\n" );
-		display_x509_certificate( &certificate, csMsg);
+		//display_x509_certificate( &certificate, csMsg);
 		display_x509(&certificate, &x509_msg);     
 
 
@@ -371,21 +279,12 @@ void CANS1ParseDlg::GetCertInfo()
 		}
 	}
 
-	char pTempData[13][600];
-	SetData(&x509_msg, pTempData);
-	ShowData(pTempData);
+
+	ListCtrShow(&x509_msg);  //将解析的证书显示到列表控件上。
 
 	free_x509_certificate(&certificate);
 	free_x509_msg(&x509_msg);	
 }
-
-
-
-
-
-
-
-
 
 void CANS1ParseDlg::OnBnClickedButton2()
 {
@@ -410,11 +309,13 @@ void CANS1ParseDlg::OnBnClickedButton2()
 		SetDlgItemText(IDC_EDIT2,strFilePath.GetBuffer(strFilePath.GetLength()));	//show the path
 		m_strFilePath=strFilePath;
         
-		GetCertInfo();
-	}else
-	{
-	   SetDlgItemText(IDC_EDIT1 ,"");
+		GetCertInfo();   //解析证书数据
+
+	}else   
+	{  //清空所有显示
+	   SetDlgItemText(IDC_EDIT1,"");
        SetDlgItemText(IDC_EDIT2, "");
+	   m_listCtrl.DeleteAllItems(); 
 	}
 }
 
@@ -422,17 +323,18 @@ void CANS1ParseDlg::OnLvnItemchangedList2(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
 	// TODO: Add your control notification handler code here
-	CString str;  char tmp[600];
-     for(int i = 0; i < m_listCtrl.GetItemCount(); i++)
-	 {
-       if(m_listCtrl.GetItemState(i, LVIS_SELECTED) == LVIS_SELECTED)
-	   {
+	CString str; 
+	char tmp[MAX_SHOW_CHAR];
 
-          m_listCtrl.GetItemText(i,1,tmp, 600);
+    for(int i = 0; i < m_listCtrl.GetItemCount(); i++)
+	{
+      if(m_listCtrl.GetItemState(i, LVIS_SELECTED) == LVIS_SELECTED)
+	  {
+          m_listCtrl.GetItemText(i,1,tmp, MAX_SHOW_CHAR);
 		  str = (CString)tmp;
           SetDlgItemText(IDC_EDIT1, str);
-	   }
-	 }
+	  }
+	}
 
 	*pResult = 0;
 }
